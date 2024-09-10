@@ -1,0 +1,22 @@
+{
+    "name": "unibox/unibox-en",
+    "authors": [
+        {
+            "name": "liuyuan",
+            "email": "liuyuan@unibox.com.cn"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^5.2",
+        "authorizenet/authorizenet": "^1.9",
+        "braintree/braintree_php": "^3.27"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    },
+    "require-dev": {
+    }
+}
