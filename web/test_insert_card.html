@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test insertCardCredit API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .response.show {
+            display: block;
+        }
+
+        .response h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .response pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .success {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .error {
+            border-left: 4px solid #f44336;
+        }
+
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .sample-data {
+            background-color: #e3f2fd;
+            border: 1px solid #2196F3;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .sample-data button {
+            background-color: #2196F3;
+            padding: 6px 15px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .sample-data button:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Test insertCardCredit API</h1>
+
+        <div class="note">
+            <strong>Note:</strong> This page tests the insertCardCredit API endpoint at <code>http://zpxapi:8088/</code>
+        </div>
+
+        <div class="sample-data">
+            <strong>Test Card Numbers:</strong><br>
+            Visa: 4111111111111111 | MasterCard: 5424000000000015 | Amex: 378282246310005<br>
+            <button type="button" onclick="fillSampleData()">Fill Sample Data</button>
+        </div>
+
+        <form id="cardForm">
+            <div class="form-group">
+                <label for="accessToken">Access Token:</label>
+                <input type="text" id="accessToken" name="_accessToken" required placeholder="Your access token">
+            </div>
+
+            <div class="form-group">
+                <label for="memberId">Member ID:</label>
+                <input type="text" id="memberId" name="_memberId" required placeholder="Your member ID">
+            </div>
+
+            <div class="form-group">
+                <label for="cardNum">Card Number (16 digits):</label>
+                <input type="text" id="cardNum" name="cardNum" required placeholder="4111111111111111" maxlength="16"
+                    pattern="\d{16}">
+            </div>
+
+            <div class="form-group">
+                <label for="cardHolderName">Card Holder Name:</label>
+                <input type="text" id="cardHolderName" name="cardHolderName" required placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="expDate">Expiration Date (MMYY, e.g., 1226 for Dec 2026):</label>
+                <input type="text" id="expDate" name="expDate" required placeholder="1226" maxlength="4"
+                    pattern="\d{4}">
+            </div>
+
+            <div class="form-group">
+                <label for="cvv2">CVV2 (3 digits):</label>
+                <input type="text" id="cvv2" name="cvv2" required placeholder="123" maxlength="3" pattern="\d{3}">
+            </div>
+
+            <div class="form-group">
+                <label for="zipcode">Zipcode (5 digits):</label>
+                <input type="text" id="zipcode" name="zipcode" placeholder="12345" maxlength="5" pattern="\d{5}">
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="isDefault" name="isDefault" value="1">
+                    Set as Default Card
+                </label>
+            </div>
+
+            <button type="submit">Submit Card</button>
+        </form>
+
+        <div id="response" class="response">
+            <h3>Response:</h3>
+            <pre id="responseContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://zpxapi:8088';
+
+        function fillSampleData() {
+            document.getElementById('accessToken').value = 'test_token_12345';
+            document.getElementById('memberId').value = '1001';
+            document.getElementById('cardNum').value = '4111111111111111';
+            document.getElementById('cardHolderName').value = 'John Doe';
+            document.getElementById('expDate').value = '1226';
+            document.getElementById('cvv2').value = '123';
+            document.getElementById('zipcode').value = '12345';
+        }
+
+        document.getElementById('cardForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {};
+
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (key === 'isDefault') {
+                    data[key] = document.getElementById('isDefault').checked ? '1' : '0';
+                } else {
+                    data[key] = value;
+                }
+            }
+
+            // Show loading
+            const responseDiv = document.getElementById('response');
+            const responseContent = document.getElementById('responseContent');
+            responseDiv.className = 'response show';
+            responseContent.textContent = 'Loading...';
+
+            try {
+                // Method 1: Using fetch with FormData
+                const formDataToSend = new FormData();
+                for (let key in data) {
+                    formDataToSend.append(key, data[key]);
+                }
+
+                const response = await fetch(API_BASE_URL + '/Zpi/CardCredit/insertCardCredit', {
+                    method: 'POST',
+                    body: formDataToSend
+                });
+
+                // Read response as text first
+                const responseText = await response.text();
+
+                // Try to parse as JSON
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    // Not JSON, display the HTML error
+                    responseContent.textContent = 'Server Error (HTML Response):\n\n' + responseText.substring(0, 2000);
+                    responseDiv.classList.add('error');
+                    responseDiv.classList.remove('success');
+                    return;
+                }
+
+                // Display response
+                responseContent.textContent = JSON.stringify(result, null, 2);
+
+                // Add success/error styling
+                if (result.ret === 0) {
+                    responseDiv.classList.add('success');
+                    responseDiv.classList.remove('error');
+                } else {
+                    responseDiv.classList.add('error');
+                    responseDiv.classList.remove('success');
+                }
+
+                // Show error messages
+                if (result.ret !== 0) {
+                    const errorMessages = {
+                        '1': 'Need login',
+                        '2': 'Invalid card number',
+                        '3': 'Empty card holder name',
+                        '4': 'Empty zipcode',
+                        '5': 'Empty expiry date or invalid expiry date (format: MMYY)',
+                        '6': 'Empty CVV2',
+                        '7': 'The credit card has been bound by other member',
+                        '8': 'Insert credit card failed',
+                        '9': 'Payment gateway error'
+                    };
+                    const errorMsg = errorMessages[result.ret] || 'Unknown error';
+                    responseContent.textContent += '\n\nError: ' + errorMsg;
+                    if (result.msg) {
+                        responseContent.textContent += '\nMessage: ' + result.msg;
+                    }
+                }
+
+            } catch (error) {
+                responseContent.textContent = 'Error: ' + error.message + '\n\n';
+                responseContent.textContent += 'Make sure:\n';
+                responseContent.textContent += '1. The API server is running at ' + API_BASE_URL + '\n';
+                responseContent.textContent += '2. CORS is enabled on the server\n';
+                responseContent.textContent += '3. The endpoint path is correct\n';
+
+                responseDiv.classList.add('error');
+                responseDiv.classList.remove('success');
+            }
+        });
+    </script>
+</body>
+
+</html>
