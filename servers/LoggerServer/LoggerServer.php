@@ -1,7 +1,7 @@
 <?php
 ini_set('default_socket_timeout', -1);
 
-date_default_timezone_set('Asia/Shanghai');
+date_default_timezone_set('America/Chicago');
 
 $conf = array(
     'dev' => array('ip'=>'127.0.0.1','port'=>6379),
